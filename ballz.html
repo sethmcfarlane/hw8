@@ -173,13 +173,13 @@
         }
         else if (dist(mousePos[0], mousePos[1], mouseX, mouseY) >= 300){
             var a = atan2(mouseY - mousePos[1], mouseX - mousePos[0]);
-            var x = 300 * cos(a);
-            var y = 300 * sin(a);
+            var x = (300 * cos(a)) + mousePos[0];
+            var y = (300 * sin(a)) + mousePos[1];;
             var ball = {
                 x: x,
                 y: y,
-                changeInX: (300/12),
-                changeInY: 0,
+                changeInX: (mousePos[0]-x)/12,
+                changeInY: (mousePos[1]-y)/12,
                 h: random(360),
                 s: random(50,80),
             };
