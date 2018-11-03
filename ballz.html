@@ -1,0 +1,207 @@
+<html>
+<head>
+    <script src="p5.min.js"></script>
+    <script src="p5.dom.min.js"></script>
+    <script src="p5.sound.min.js"></script>
+    <style>
+    html, body {
+        margin: 0;
+        padding: 0;
+    }
+</style>
+<meta charset="utf-8" />
+</head>
+<body>
+    <script>
+
+    var balls = [];
+    var press = 0;
+    var mousePos = [];
+    var tone;
+    var lineStroke;
+    var keys = [];
+    var noBurst = false;
+
+    function preload() {
+      tone = loadSound('tone.wav');
+    }
+
+
+    function setup() {
+        createCanvas(windowWidth, windowHeight);
+        colorMode(HSL);
+
+        // for (var i = width/2; i < width; i+=width/15) {
+        //     var key = {
+        //         x: i-width/30,
+        //         y: 0,
+        //         width: width/30,
+        //         height: 50,
+        //     };
+        //     keys.push(key);
+        // }
+        // for (var i = width/2; i > 0; i-=width/15) {
+        //     var key = {
+        //         x: i-width/30,
+        //         y: 0,
+        //         width: width/30,
+        //         height: 50,
+        //     };
+        //     keys.push(key);
+        // }
+
+        for (var i = 0; i < 2; i++) {
+            var ball = {
+                x: random(10, width - 25),
+                y: random(10, height - 25),
+                changeInX: random(1,6)*random([-1,1]),
+                changeInY: random(1,6)*random([-1,1]),
+                h: random(360),
+                s: random(50,80),
+            };
+            balls.push(ball);
+        }
+    }
+
+    function draw() {
+
+        background(220);
+
+        // for (var i = 1; i < keys.length; i++){
+        //     var key = keys[i];
+        //     noStroke();
+        //     fill(0);
+        //     rect(key.x, key.y, key.width, key.height);
+        // }
+
+        for (var i = 0; i < balls.length; i++){
+            var hit = false;
+            var ball = balls[i];
+            noStroke();
+            fill(ball.h, ball.s, 70);
+            ellipse(ball.x, ball.y, 40);
+
+            ball.x += ball.changeInX;
+            ball.y += ball.changeInY;
+
+            if (ball.x > width - 20) {
+                ball.changeInX *= -1;
+                var hit = true;
+                // tone.play();
+            }
+
+            if (ball.y > height - 20) {
+                ball.changeInY *= -1;
+                // tone.play();
+            }
+
+            if (ball.x < 20) {
+                ball.changeInX *= -1;
+                // tone.play();
+            }
+
+            if (ball.y < 20) {
+                ball.changeInY *= -1;
+                // tone.play();
+            }
+            // for (var i = 1; i < keys.length; i++){
+            //     var key = keys[i];
+            //     if (ball.y <= key.height + 20 && ball.x >= key.x){
+            //         print(key.x);
+            //         ball.changeInY *= -1;
+            //     }
+            // }
+            if (hit == true){
+                rect(width-5, ball.y, 10, 50);
+            }
+            print(hit);
+        }
+
+        var lineX2 = mouseX
+        var lineY2 = mouseY
+
+        if (mouseIsPressed){
+            if (abs(mousePos[0] - mouseX) < 50 && abs(mousePos[1] - mouseY) < 50){
+                lineStroke = 90;
+                stroke(90);
+                line(mousePos[0], mousePos[1], lineX2, lineY2);
+
+            }
+            else if (dist(mousePos[0], mousePos[1], mouseX, mouseY) >= 300){
+                translate(mousePos[0], mousePos[1]);
+                var a = atan2(mouseY - mousePos[1], mouseX - mousePos[0]);
+                rotate(a);
+                stroke(0);
+                strokeWeight(4);
+                line(0, 0, 300, 0);
+                print(a);
+            }
+            else {
+                fill(0, 0, 90)
+                ellipse(mouseX, mouseY, 40);
+                stroke(0);
+                line(mousePos[0], mousePos[1], lineX2, lineY2);
+            }
+
+            press ++;
+            strokeWeight(4);
+
+            if (abs(mousePos[0] - mouseX) >= 5 && abs(mousePos[1] - mouseY) >= 5){
+                noBurst = true;
+            }
+        }
+    }
+
+    function mouseClicked(){
+        if (abs(mousePos[0] - mouseX) <= 5 && abs(mousePos[1] - mouseY) <= 5 && noBurst == false){
+
+            for (var i = 0; i < 10; i++) {
+                var mBall = {
+                    x: mouseX,
+                    y: mouseY,
+                    changeInX: random(1,6)*random([-1,1]),
+                    changeInY: random(1,6)*random([-1,1]),
+                    h: random(360),
+                    s: random(50,80),
+                };
+            balls.push(mBall);
+        }
+
+        }
+        else if (abs(mousePos[0] - mouseX) < 50 && abs(mousePos[1] - mouseY) < 50){
+
+        }
+        else if (dist(mousePos[0], mousePos[1], mouseX, mouseY) >= 300){
+            var ball = {
+                x: mouseX,
+                y: mouseY,
+                changeInX: ((mousePos[0] - mouseX)-((dist(mousePos[0], mouseX, mousePos[1], mouseY))-300))/12,
+                changeInY: ((mousePos[1] - mouseY)-((dist(mousePos[0], mouseX, mousePos[1], mouseY))-300))/12,
+                h: random(360),
+                s: random(50,80),
+            };
+            balls.push(ball);
+        }
+        else {
+            var ball = {
+                x: mouseX,
+                y: mouseY,
+                changeInX: (mousePos[0] - mouseX)/12,
+                changeInY: (mousePos[1]- mouseY)/12,
+                h: random(360),
+                s: random(50,80),
+            };
+            balls.push(ball);
+        }
+        press = 0;
+        noBurst = false;
+    }
+    function mousePressed(){
+        mousePos = [];
+        mousePos.push(mouseX);
+        mousePos.push(mouseY);
+    }
+
+    </script>
+</body>
+</html>
