@@ -114,7 +114,7 @@
             if (hit == true){
                 rect(width-5, ball.y, 10, 50);
             }
-            print(hit);
+            // print(hit);
         }
 
         var lineX2 = mouseX
@@ -134,7 +134,7 @@
                 stroke(0);
                 strokeWeight(4);
                 line(0, 0, 300, 0);
-                print(a);
+                // print(a);
             }
             else {
                 fill(0, 0, 90)
@@ -172,11 +172,14 @@
 
         }
         else if (dist(mousePos[0], mousePos[1], mouseX, mouseY) >= 300){
+            var a = atan2(mouseY - mousePos[1], mouseX - mousePos[0]);
+            var x = 300 * cos(a);
+            var y = 300 * sin(a);
             var ball = {
-                x: mouseX,
-                y: mouseY,
-                changeInX: ((mousePos[0] - mouseX)-((dist(mousePos[0], mouseX, mousePos[1], mouseY))-300))/12,
-                changeInY: ((mousePos[1] - mouseY)-((dist(mousePos[0], mouseX, mousePos[1], mouseY))-300))/12,
+                x: x,
+                y: y,
+                changeInX: (300/12),
+                changeInY: 0,
                 h: random(360),
                 s: random(50,80),
             };
