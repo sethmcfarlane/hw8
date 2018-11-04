@@ -17,129 +17,130 @@
     var balls = [];
     var press = 0;
     var mousePos = [];
-    var tone;
     var lineStroke;
-    var keys = [];
     var noBurst = false;
-
-    function preload() {
-      tone = loadSound('tone.wav');
-    }
-
+    var mute = false;
+    var ballPos;
 
     function setup() {
         createCanvas(windowWidth, windowHeight);
         colorMode(HSL);
+    }
 
-        // for (var i = width/2; i < width; i+=width/15) {
-        //     var key = {
-        //         x: i-width/30,
-        //         y: 0,
-        //         width: width/30,
-        //         height: 50,
-        //     };
-        //     keys.push(key);
-        // }
-        // for (var i = width/2; i > 0; i-=width/15) {
-        //     var key = {
-        //         x: i-width/30,
-        //         y: 0,
-        //         width: width/30,
-        //         height: 50,
-        //     };
-        //     keys.push(key);
-        // }
-
-        for (var i = 0; i < 2; i++) {
-            var ball = {
-                x: random(10, width - 25),
-                y: random(10, height - 25),
-                changeInX: random(1,6)*random([-1,1]),
-                changeInY: random(1,6)*random([-1,1]),
-                h: random(360),
-                s: random(50,80),
-            };
-            balls.push(ball);
+    function keyTyped() {
+        if (key === 'm'){
+            mute = !mute
+        }
+        if (key === 'r'){
+            balls = [];
         }
     }
 
     function draw() {
-
         background(220);
 
-        // for (var i = 1; i < keys.length; i++){
-        //     var key = keys[i];
-        //     noStroke();
-        //     fill(0);
-        //     rect(key.x, key.y, key.width, key.height);
-        // }
+        noStroke();
+        fill(0);
+        textSize(32);
+        text('press "r" to reset', width - 250, 35);
+        if (mute == false){
+            textSize(32);
+            text('press "m" to mute', 20, 35);
+            textSize(15);
+            text('please', 20, 60);
+        }
+        else {
+            textSize(32);
+            text('press "m" to unmute', 20, 35);
+            textSize(15);
+            text('dont do it', 20, 60);
+        }
 
         for (var i = 0; i < balls.length; i++){
-            var hit = false;
             var ball = balls[i];
             noStroke();
-            fill(ball.h, ball.s, 70);
+            fill(ball.h, ball.s, 60);
             ellipse(ball.x, ball.y, 40);
 
             ball.x += ball.changeInX;
             ball.y += ball.changeInY;
 
-            if (ball.x > width - 20) {
+            var ballFreq = map(ball.h, 100, 15, 10, 2000);
+
+            if (ball.x >= width - 20) {
+                var ballPos = ball.y;
                 ball.changeInX *= -1;
-                var hit = true;
-                // tone.play();
+                ballPos = ball.y;
+                if (mute == false){
+                    var osc = new p5.Oscillator();
+                    osc.start();
+                    osc.freq(ballFreq);
+                    osc.stop(.1);
+                }
             }
 
-            if (ball.y > height - 20) {
+            if (ball.y >= height - 20) {
                 ball.changeInY *= -1;
-                // tone.play();
+                if (mute == false){
+                    var osc = new p5.Oscillator();
+                    osc.start();
+                    osc.freq(ballFreq);
+                    osc.stop(.1);
+                }
             }
 
-            if (ball.x < 20) {
+            if (ball.x <= 20) {
                 ball.changeInX *= -1;
-                // tone.play();
+                if (mute == false){
+                    var osc = new p5.Oscillator();
+                    osc.start();
+                    osc.freq(ballFreq);
+                    osc.stop(.1);
+                }
             }
 
-            if (ball.y < 20) {
+            if (ball.y <= 20) {
                 ball.changeInY *= -1;
-                // tone.play();
+                if (mute == false){
+                    var osc = new p5.Oscillator();
+                    osc.start();
+                    osc.freq(ballFreq);
+                    osc.stop(.1);
+                }
             }
-            // for (var i = 1; i < keys.length; i++){
-            //     var key = keys[i];
-            //     if (ball.y <= key.height + 20 && ball.x >= key.x){
-            //         print(key.x);
-            //         ball.changeInY *= -1;
-            //     }
-            // }
-            if (hit == true){
-                rect(width-5, ball.y, 10, 50);
-            }
-            // print(hit);
         }
 
         var lineX2 = mouseX
         var lineY2 = mouseY
 
         if (mouseIsPressed){
+            lineDist = dist(mousePos[0], mousePos[1], mouseX, mouseY)
+            var lineH = map(lineDist, 0, 400, 125, 10);
             if (abs(mousePos[0] - mouseX) < 50 && abs(mousePos[1] - mouseY) < 50){
                 lineStroke = 90;
                 stroke(90);
                 line(mousePos[0], mousePos[1], lineX2, lineY2);
+                fill(90);
+                noStroke();
+                ellipse(mouseX, mouseY, 40);
 
             }
-            else if (dist(mousePos[0], mousePos[1], mouseX, mouseY) >= 300){
+            else if (dist(mousePos[0], mousePos[1], mouseX, mouseY) >= 400){
                 translate(mousePos[0], mousePos[1]);
                 var a = atan2(mouseY - mousePos[1], mouseX - mousePos[0]);
+                var x = (400 * cos(a));
+                var y = (400 * sin(a));
+                fill(15, 80, 60);
+                ellipse(x, y, 40);
                 rotate(a);
-                stroke(0);
+                stroke(15, 80, 60);
                 strokeWeight(4);
-                line(0, 0, 300, 0);
-                // print(a);
+                line(0, 0, 400, 0);
             }
             else {
-                fill(0, 0, 90)
+                fill(lineH, 80, 60)
                 ellipse(mouseX, mouseY, 40);
-                stroke(0);
+                stroke(lineH, 80, 60);
                 line(mousePos[0], mousePos[1], lineX2, lineY2);
             }
 
@@ -151,8 +152,9 @@
             }
         }
     }
-
     function mouseClicked(){
+        lineDist = dist(mousePos[0], mousePos[1], mouseX, mouseY)
+        var lineH = map(lineDist, 0, 400, 125, 10);
         if (abs(mousePos[0] - mouseX) <= 5 && abs(mousePos[1] - mouseY) <= 5 && noBurst == false){
 
             for (var i = 0; i < 10; i++) {
@@ -164,24 +166,24 @@
                     h: random(360),
                     s: random(50,80),
                 };
-            balls.push(mBall);
-        }
+                balls.push(mBall);
+            }
 
         }
         else if (abs(mousePos[0] - mouseX) < 50 && abs(mousePos[1] - mouseY) < 50){
 
         }
-        else if (dist(mousePos[0], mousePos[1], mouseX, mouseY) >= 300){
+        else if (dist(mousePos[0], mousePos[1], mouseX, mouseY) >= 400){
             var a = atan2(mouseY - mousePos[1], mouseX - mousePos[0]);
-            var x = (300 * cos(a)) + mousePos[0];
-            var y = (300 * sin(a)) + mousePos[1];;
+            var x = (400 * cos(a)) + mousePos[0]; //convert to cartesian coordinates, translate to mouse origin
+            var y = (400 * sin(a)) + mousePos[1];
             var ball = {
                 x: x,
                 y: y,
-                changeInX: (mousePos[0]-x)/12,
-                changeInY: (mousePos[1]-y)/12,
-                h: random(360),
-                s: random(50,80),
+                changeInX: (mousePos[0]-x)/13,
+                changeInY: (mousePos[1]-y)/13,
+                h: 10,
+                s: 80,
             };
             balls.push(ball);
         }
@@ -189,10 +191,10 @@
             var ball = {
                 x: mouseX,
                 y: mouseY,
-                changeInX: (mousePos[0] - mouseX)/12,
-                changeInY: (mousePos[1]- mouseY)/12,
-                h: random(360),
-                s: random(50,80),
+                changeInX: (mousePos[0] - mouseX)/13,
+                changeInY: (mousePos[1]- mouseY)/13,
+                h: lineH,
+                s: 80,
             };
             balls.push(ball);
         }
